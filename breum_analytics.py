@@ -44,4 +44,47 @@ def write_excel_file(folder_name, filename, data):
     with open(file_path, 'wb') as file:
         file.write(response.content)
         print(f"Excel data saved to {file_path}")
-        
+
+
+# Process data and generate output
+
+# Function 1: Process text data
+import requests
+
+url = 'https://www.gutenberg.org/cache/epub/1342/pg1342-images.html'
+response = requests.get(url)
+text = response.text.lower()
+
+print(text)
+
+# Word count
+words = text.split()
+words = [word for word in words if word.isalnum()]
+unique_words = set(words)
+with open('unique_words.txt', 'w') as file:
+    for word in unique_words:
+        file.write(word + '\n')
+
+# Word frequency
+words = text.split()
+words = [word for word in words if word.isalnum()]
+word_frequency = {}
+for word in words:
+    word_frequency[word] = word_frequency.get(word, 0) + 1
+with open('word_frequency.txt', 'w') as file:
+    for word, frequency in word_frequency.items():
+        file.write(f"{word}: {frequency}\n")
+
+# Character count
+character_count = len(text)
+
+print(f"Character Count: {character_count}")
+
+non_space_character_count = len([char for char in text if char != ' '])
+
+print(f"Non-Space Character Count: {non_space_character_count}")
+
+# Identification of Mr. Darcy
+darcy_occurences = [word for word in words if word == 'darcy']
+
+print("Occurrences of 'Mr. Darcy':", darcy_occurences)
