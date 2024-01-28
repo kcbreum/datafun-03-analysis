@@ -6,6 +6,7 @@ import xlwt
 import pathlib
 import logging
 from io import StringIO
+import json
 
 # External library imports
 import requests
@@ -14,9 +15,7 @@ import requests
 import breum_projsetup
 import utils_breum
 
-# Data acquisition
-import requests
-
+# Define Functions
 def fetch_and_write_txt_data(folder_name, filename, url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -24,6 +23,14 @@ def fetch_and_write_txt_data(folder_name, filename, url):
         pass
     else:
         print(f"Failed to fetch data: {response.status_code}")
+
+def fetch_and_write_csv_data(folder_name, filename, url):
+    response == requests.get(url)
+    if response.status_code == 200:
+        # Call your write function to save the response content
+        pass
+    else:
+        print(f"Failed to fetch CSV data: {response.status_code}")
 
 def fetch_and_write_excel_data(folder_name, filename, url):
     response == requests.get(url)
@@ -33,7 +40,29 @@ def fetch_and_write_excel_data(folder_name, filename, url):
     else:
         print(f"Failed to fetch Excel data: {response.status_code}")
 
-# Write data
+def fetch_and_write_json_data(folder_name, filename, url):
+    response == requests.get(url)
+    if response.status_code == 200:
+        # Call your write function to save the response content
+        pass
+    else:
+        print(f"Failed to fetch JSON data: {response.status_code}")
+
+def fetch_weather_data(api_url):
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+    
+def save_json(data, filename):
+    with open(filename, 'w') as file:
+        json.dump(data, file)
+
+def read_json(filename):
+    with open(filename, 'r') as file:
+        return json.load(file)
+
 from pathlib import Path
 
 def write_text_file(folder_name, filename, data):
@@ -49,7 +78,6 @@ def write_excel_file(folder_name, filename, data):
         print(f"Excel data saved to {file_path}")
 
 
-# Process data and generate output
 
 # Function 1: Process text data
 url = 'https://www.gutenberg.org/cache/epub/1342/pg1342-images.html'
@@ -212,8 +240,8 @@ try:
 
     with open(text_file_path, 'w', encoding='utf-8') as text_file:
         for row_num in range(1, sheet.nrows):
-            quality_column_index = sheet.cell_value(row_num, quality_column_index)
-            if quality_column_index >= 5:
+            quality_value = sheet.cell_value(row_num, quality_column_index)
+            if quality_value >= 5:
                 row_data = sheet.row_values(row_num)
                 text_file.write(','.join(map(str, row_data)) + '\n')
 
@@ -224,3 +252,28 @@ except FileNotFoundError:
 
 except Exception as e:
     logging.error(f"Error occurred: {e}")
+
+
+
+# Function 4: Process JSON Data    
+api_url = 'http://api.open-notify.org/astros.json'
+weather_data = fetch_weather_data(api_url)
+if weather_data:
+    save_json(weather_data, 'weather_data.json')
+    saved_weather_data = read_json('weather_data.json')
+    print(saved_weather_data)
+
+
+
+# Main function
+def main():
+    ''' Main function to demonstrate module capabilities'''
+    print(f"Name: {utils_breum.my_name_string}")
+
+    txt_url = 'https://www.gutenberg.org/cache/epub/1342/pg1342-images.html'
+
+    csv_url = 'https://raw.githubusercontent.com/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv'
+
+    excel_url = 'https://raw.githubusercontent.com/kying18/wine-classification/master/winequality-red.csv'
+
+    json_url = 'http://api.open-notify.org/astros.json'
