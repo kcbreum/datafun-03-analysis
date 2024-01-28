@@ -3,6 +3,8 @@
 # Standard library imports
 import csv
 import pathlib
+import logging
+from io import StringIO
 
 # External library imports
 import requests
@@ -49,8 +51,6 @@ def write_excel_file(folder_name, filename, data):
 # Process data and generate output
 
 # Function 1: Process text data
-import requests
-
 url = 'https://www.gutenberg.org/cache/epub/1342/pg1342-images.html'
 response = requests.get(url)
 text = response.text.lower()
@@ -84,7 +84,81 @@ non_space_character_count = len([char for char in text if char != ' '])
 
 print(f"Non-Space Character Count: {non_space_character_count}")
 
-# Identification of Mr. Darcy
-darcy_occurences = [word for word in words if word == 'darcy']
 
-print("Occurrences of 'Mr. Darcy':", darcy_occurences)
+
+# Function 2: Process CSV Data
+import logging
+import requests
+import csv
+from io import StringIO
+
+logging.basicConfig(level=logging.INFO)
+
+file_path = 'movies.csv'
+url = 'https://raw.githubusercontent.com/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv'
+
+try:
+    response = requests.get(url)
+    if response.status_code == 200:
+        logging.info('Successfully fetched the movie data.')
+        movie_data = response.content.decode('utf-8')
+        csv_reader = csv.reader(StringIO(movie_data))
+
+        with open(file_path, 'w', newline='', encoding='utf-8') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            
+            for row in csv_reader:
+                movie_tuple = tuple(row)
+                csv_writer.writerow(movie_tuple)  # Write the row to the CSV file
+
+                title, year, genre, rank, rating, director, actors, runtime, votes, revenue, metascore, description = movie_tuple
+
+                logging.debug(f"Title: {title}")
+                logging.debug(f"Year: {year}")
+                logging.debug(f"Genre: {genre}")
+                logging.debug(f"Director: {director}")
+                logging.debug(f"Rating: {rating}")
+
+    else:
+        logging.error(f'Failed to fetch data. Status code: {response.status_code}')
+
+except requests.RequestException as e:
+    logging.error(f'Failed to fetch data. Error: {e}')
+
+except FileNotFoundError:
+    logging.error(f"File not found: {file_path}")
+
+except Exception as e:
+    logging.error(f"Error occurred: {e}")
+
+# Unique genres
+csv_file_path = 'movies.csv'
+text_file_path = 'unique_genres.txt'
+
+try:
+    response = requests.get(url)
+    if response.status_code ==200:
+        movie_data = response.content.decode('utf-8')
+        csv_reader = csv.reader(StringIO(movie_data))
+
+        unique_genres = set()
+        next(csv_reader)
+        for row in csv_reader:
+            title, year, genre, rank, rating, director, actors, runtime, votes, revenue, metascore, description = row
+            unique_genres.add(genre)
+        with open(text_file_path, 'w', encoding='utf-8') as text_file:
+            for genre in unique_genres:
+                text_file.write(f"{genre}\n")
+except requests.RequestException as e:
+    logging.error(f'Failed to fetch data. Error: {e}')
+
+except FileNotFoundError:
+    logging.error(f"File not found: {csv_file_path}")
+
+except Exception as e:
+    logging.error(f"Error occurred: {e}")
+
+
+
+# Function 3: Process Excel Data
+    
