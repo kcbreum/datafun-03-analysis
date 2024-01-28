@@ -268,12 +268,13 @@ if weather_data:
 # Main function
 def main():
     ''' Main function to demonstrate module capabilities'''
-    print(f"Name: {utils_breum.my_name_string}")
+    print(f"Name: {utils_breum.byline}")
 
-    txt_url = 'https://www.gutenberg.org/cache/epub/1342/pg1342-images.html'
 
-    csv_url = 'https://raw.githubusercontent.com/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv'
 
-    excel_url = 'https://raw.githubusercontent.com/kying18/wine-classification/master/winequality-red.csv'
+# Conditional script
+if __name__ == '__main__':
+    main()
 
-    json_url = 'http://api.open-notify.org/astros.json'
+
+# Help was received using AI for assistance with reviewing errors. All code was my own or from utilizing lessons in Modules 1, 2, and 3
