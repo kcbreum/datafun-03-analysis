@@ -2,6 +2,7 @@
 
 # Standard library imports
 import csv
+import xlwt
 import pathlib
 import logging
 from io import StringIO
@@ -87,11 +88,6 @@ print(f"Non-Space Character Count: {non_space_character_count}")
 
 
 # Function 2: Process CSV Data
-import logging
-import requests
-import csv
-from io import StringIO
-
 logging.basicConfig(level=logging.INFO)
 
 file_path = 'movies.csv'
@@ -109,7 +105,7 @@ try:
             
             for row in csv_reader:
                 movie_tuple = tuple(row)
-                csv_writer.writerow(movie_tuple)  # Write the row to the CSV file
+                csv_writer.writerow(movie_tuple)
 
                 title, year, genre, rank, rating, director, actors, runtime, votes, revenue, metascore, description = movie_tuple
 
@@ -161,4 +157,70 @@ except Exception as e:
 
 
 # Function 3: Process Excel Data
-    
+logging.basicConfig(level=logging.INFO)
+
+file_path = 'wine.xls'
+url = 'https://raw.githubusercontent.com/kying18/wine-classification/master/winequality-red.csv'
+
+try:
+    response = requests.get(url)
+    if response.status_code == 200:
+        logging.info('Successfully fetched the wine data.')
+        wine_data = response.text
+        csv_reader = csv.reader(StringIO(wine_data), delimiter=';')
+
+        workbook = xlwt.Workbook()
+        sheet = workbook.add_sheet('Wine Data')
+
+        header = next(csv_reader)
+        for col_num, col_name in enumerate(header):
+            sheet.write(0, col_num, col_name)
+
+        for row_num, row in enumerate(csv_reader, start=1):
+            for col_num, value in enumerate(row):
+                sheet.write(row_num, col_num, value)
+
+        workbook.save(file_path)
+        logging.info(f'Excel file "{file_path}" created successfully.')
+
+    else:
+        logging.error(f'Failed to fetch data. Status code: {response.status_code}')
+
+except requests.RequestException as e:
+    logging.error(f'Failed to fetch data. Error: {e}')
+
+except FileNotFoundError:
+    logging.error(f"File not found: {file_path}")
+
+except Exception as e:
+    logging.error(f"Error occurred: {e}")
+
+# Analyzing to list wine quality over 5
+import logging
+import xlrd
+
+logging.basicConfig(level=logging.INFO)
+
+excel_file_path = 'wine.xls'
+text_file_path = 'quality_above_5.txt'
+
+try:
+    workbook = xlrd.open_workbook(excel_file_path)
+    sheet = workbook.sheet_by_name('Wine Data')
+
+    quality_column_index = sheet.row_values(0).index('quality')
+
+    with open(text_file_path, 'w', encoding='utf-8') as text_file:
+        for row_num in range(1, sheet.nrows):
+            quality_column_index = sheet.cell_value(row_num, quality_column_index)
+            if quality_column_index >= 5:
+                row_data = sheet.row_values(row_num)
+                text_file.write(','.join(map(str, row_data)) + '\n')
+
+    logging.info(f'Filtered data written to "{text_file_path}".')
+
+except FileNotFoundError:
+    logging.error(f"File not found: {excel_file_path}")
+
+except Exception as e:
+    logging.error(f"Error occurred: {e}")
